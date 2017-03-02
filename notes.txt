@@ -1,0 +1,3 @@
+list of debian wordlist packages:
+	https://packages.debian.org/jessie/wordlist
+
