@@ -33,8 +33,6 @@ Notes
 -----
 Don't blame me if you get a password you consider offensive. The are just too many possibilities to even attempt to filter themout.
 
-[overlayRoot.sh](overlayRoot.sh) is not my work. It came from http://wiki.psuter.ch/doku.php?id=solve_raspbian_sd_card_corruption_issues_with_read-only_mounted_root_partition and is included in this repository for convience.
-
 [hidsetup.sh](hidsetup.sh) is derrived from here: http://isticktoit.net/?p=1383
 
 LCD support is based on this: http://www.raspberrypi-spy.co.uk/2012/07/16x2-lcd-module-control-using-python/
