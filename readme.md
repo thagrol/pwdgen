@@ -28,11 +28,11 @@ For basic help: `pwdgen.py -h`
 Advanced Usage
 --------------
 See
-[docs/lcd.md](docs/lcd.md)
-[docs/push_button.md](docs/push_button.md)
-[docs/usb_keyboard.md](docs/usb_keyboard.md)
-[docs/password_dongle.md](docs/password_dongle.md)
-[docs/jessie-lite.md](docs/jessie-lite.md)
+* [docs/lcd.md](docs/lcd.md)
+* [docs/push_button.md](docs/push_button.md)
+* [docs/usb_keyboard.md](docs/usb_keyboard.md)
+* [docs/password_dongle.md](docs/password_dongle.md)
+* [docs/jessie-lite.md](docs/jessie-lite.md)
 
 Notes
 -----
