@@ -33,6 +33,9 @@ class lcd(object):
     def reset(self):
         pass
 
+    def launch(self):
+        pass
+
     def write(self, line, message):
         """write message to display"""
         pass
@@ -197,9 +200,7 @@ class hidkey(lcd):
     """simplified usb HID keyboard"""
 
     # map characters to usb hid reports
-    keymap = { 'keyup':bytearray([0,0,0,0,0,0,0,0]),
-               'return':bytearray([0,0,0x28,0,0,0,0,0]),
-               'a':bytearray([0,0,0x04,0,0,0,0,0]),
+    keymap = { 'a':bytearray([0,0,0x04,0,0,0,0,0]),
                'b':bytearray([0,0,0x05,0,0,0,0,0]),
                'c':bytearray([0,0,0x06,0,0,0,0,0]),
                'd':bytearray([0,0,0x07,0,0,0,0,0]),
@@ -225,6 +226,32 @@ class hidkey(lcd):
                'x':bytearray([0,0,0x1B,0,0,0,0,0]),
                'y':bytearray([0,0,0x1C,0,0,0,0,0]),
                'z':bytearray([0,0,0x1D,0,0,0,0,0]),
+               'A':bytearray([0x02,0,0x04,0,0,0,0,0]),
+               'B':bytearray([0x02,0,0x05,0,0,0,0,0]),
+               'C':bytearray([0x02,0,0x06,0,0,0,0,0]),
+               'D':bytearray([0x02,0,0x07,0,0,0,0,0]),
+               'E':bytearray([0x02,0,0x08,0,0,0,0,0]),
+               'F':bytearray([0x02,0,0x09,0,0,0,0,0]),
+               'G':bytearray([0x02,0,0x0A,0,0,0,0,0]),
+               'H':bytearray([0x02,0,0x0B,0,0,0,0,0]),
+               'I':bytearray([0x02,0,0x0C,0,0,0,0,0]),
+               'J':bytearray([0x02,0,0x0D,0,0,0,0,0]),
+               'K':bytearray([0x02,0,0x0E,0,0,0,0,0]),
+               'L':bytearray([0x02,0,0x0F,0,0,0,0,0]),
+               'M':bytearray([0x02,0,0x10,0,0,0,0,0]),
+               'N':bytearray([0x02,0,0x11,0,0,0,0,0]),
+               'O':bytearray([0x02,0,0x12,0,0,0,0,0]),
+               'P':bytearray([0x02,0,0x13,0,0,0,0,0]),
+               'Q':bytearray([0x02,0,0x14,0,0,0,0,0]),
+               'R':bytearray([0x02,0,0x15,0,0,0,0,0]),
+               'S':bytearray([0x02,0,0x16,0,0,0,0,0]),
+               'T':bytearray([0x02,0,0x17,0,0,0,0,0]),
+               'U':bytearray([0x02,0,0x18,0,0,0,0,0]),
+               'V':bytearray([0x02,0,0x19,0,0,0,0,0]),
+               'W':bytearray([0x02,0,0x1A,0,0,0,0,0]),
+               'X':bytearray([0x02,0,0x1B,0,0,0,0,0]),
+               'Y':bytearray([0x02,0,0x1C,0,0,0,0,0]),
+               'Z':bytearray([0x02,0,0x1D,0,0,0,0,0]),
                '1':bytearray([0,0,0x1E,0,0,0,0,0]),
                '2':bytearray([0,0,0x1F,0,0,0,0,0]),
                '3':bytearray([0,0,0x20,0,0,0,0,0]),
@@ -241,12 +268,56 @@ class hidkey(lcd):
                '%':bytearray([0x02,0,0x22,0,0,0,0,0]),
                '&':bytearray([0x02,0,0x24,0,0,0,0,0]),
                '.':bytearray([0,0,0x37,0,0,0,0,0]),
-               '?':bytearray([0x02,0,0x38,0,0,0,0,0])
+               '?':bytearray([0x02,0,0x38,0,0,0,0,0]),
+               '/':bytearray([0,0,0x38,0,0,0,0,0]),
+               '\\':bytearray([0,0,0x31,0,0,0,0,0]),
+               ':':bytearray([0x02,0,0x33,0,0,0,0,0]),
+               '-':bytearray([0,0,0x2D,0,0,0,0,0]),
+               '_':bytearray([0x02,0,0x2D,0,0,0,0,0]),
+               ' ':bytearray([0,0,0x2C,0,0,0,0,0]),
+               '~':bytearray([0x02,0,0x35,0,0,0,0,0])
                }
+    specials = { 'win':bytearray([0,0,0xE3,0,0,0,0,0]),
+                 'win-r':bytearray([0x08,0,0x15,0,0,0,0,0]),
+                 'keyup':bytearray([0,0,0,0,0,0,0,0]),
+                 'return':bytearray([0,0,0x28,0,0,0,0,0]),
+                 'right_arrow':bytearray([0,0,0x4F,0,0,0,0,0]),
+                 'left_arrow':bytearray([0,0,0x50,0,0,0,0,0]),
+                 'down_arrow':bytearray([0,0,0x51,0,0,0,0,0]),
+                 'up_arrow':bytearray([0,0,0,0x52,0,0,0,0])
+               }
+    prefixes = { 'windows':specials['win-r'] + specials['keyup'],
+                 'pixel':( specials['win'] + specials['keyup'] + specials['up_arrow'] +
+                           specials['keyup'] + specials['up_arrow'] + specials['keyup'] +
+                           specials['return'] + specials['keyup'] ),
+                 'shell':''
+                }
 
-    def __init__(self,device, enabled=True):
+    def __init__(self, device, enabled=False, launch=False, target=None, cmd=None,
+                 cmd_delay=1):
         self.__enabled = enabled
         self.__device = device
+        self.__launch = launch
+        self.__cmd_delay = cmd_delay
+        try:
+            self.__prefix = hidkey.prefixes[target]
+        except KeyError:
+            # unknown target
+            self.__launch = False
+            self.__prefix = ''
+            logging.warning('Unknow target (%s). Application launch disabled'
+                            % target)
+        self.__cmd = cmd
+
+    def launch(self):
+        if self.__enabled and self.__launch:
+            logging.debug('Sending keypresses(%s) for application launch.'
+                          % (self.__prefix + self.__cmd))
+            with open(self.__device, 'w') as d:
+                d.write(self.__prefix)
+            time.sleep(self.__cmd_delay)
+            self.write(1, self.__cmd)
+            time.sleep(self.__cmd_delay)
 
     def write(self, line, message):
         """write message to display"""
@@ -254,10 +325,13 @@ class hidkey(lcd):
             try:
                 with open(self.__device, 'w') as d:
                     for c in message:
-                        d.write(hidkey.keymap[c])
-                        d.write(hidkey.keymap['keyup'])
-                    d.write(hidkey.keymap['return'])
-                    d.write(hidkey.keymap['keyup'])
+                        try:
+                            d.write(hidkey.keymap[c])
+                        except KeyError:
+                            pass
+                        d.write(hidkey.specials['keyup'])
+                    d.write(hidkey.specials['return'])
+                    d.write(hidkey.specials['keyup'])
                     d.flush()
             except KeyboardInterrupt:
                 raise
@@ -265,12 +339,41 @@ class hidkey(lcd):
                 logging.exception('error writing to hid keyboard')
                 self.__enabled = False
 
+    def write_special(self, line, message):
+        """write message to display"""
+        if self.__enabled:
+            try:
+                with open(self.__device, 'w') as d:
+                    try:
+                        d.write(hidkey.specials[message])
+                    except KeyError:
+                        pass
+                    d.flush()
+            except KeyboardInterrupt:
+                raise
+            except:
+                logging.exception('error writing to hid keyboard')
+                self.__enabled = False
+##
+##    def write_prefix(self, line, message):
+##        """write message to display"""
+##        if self.__enabled:
+##            with open(self.__device, 'w') as d:
+##                d.write(hidkey.prefixes[message])
+##                d.flush()
+####            except KeyboardInterrupt:
+####                raise
+####            except:
+####                logging.exception('error writing to hid keyboard')
+####                self.__enabled = False
+
 class cmdbutton(object):
 
     def __init__(self, cfg, lcds, wordlist, rng):
+        
         self.__button = gpiozero.Button(cfg['button_pin'], pull_up=True,
-                                        bounce_time=0.025,
-                                        hold_time=2)
+##                                        bounce_time=0.001,
+                                        hold_time=3)
         self.__press_time = None
 
         self.__button.when_held = self.__on_hold
@@ -292,7 +395,7 @@ class cmdbutton(object):
 
     def run(self):
         while g_run_threads:
-            time.sleep(1)
+            time.sleep(0.1)
         self.__button.close()
         try:
             self.__ground.close()
@@ -301,18 +404,26 @@ class cmdbutton(object):
     
     def __on_press(self):
         # button pressed
-        self.__press_time = time.time() - self.__button.active_time
+##        self.__press_time = time.time() - self.__button.active_time
+        self.__press_time = time.time()
+        logging.debug('Pressed at %s' % self.__press_time)
 
     def __on_release(self):
-        # short press
-        if time.time() - self.__press_time < 2:
+        release_time = time.time()
+        pressed_for = release_time - self.__press_time
+        logging.debug('Released at %s after %s' % (release_time, pressed_for))
+        if pressed_for < 2.0:
+            # short press
             outputpasswords(genpasswords(self.__wordlist, self.__rng, self.__cfg),
                             self.__lcds)
 
     def __on_hold(self):
         # button held
-        os.system('sudo poweroff')
-        sys.exit(0)
+        if _DEBUG:
+            os.system('echo SUDO POWEROFF')
+        else:
+            os.system('sudo poweroff')
+            sys.exit(0)
 
 
 ## functions
@@ -333,6 +444,10 @@ def getconfig(configfile='pwdgen.cfg'):
 ##    hdd44780_rs
 ##    hidkey_device
 ##    hidkey_enabled
+##    hidkey_launch
+##    hidkey_target
+##    hidkey_cmd
+##    hidkey_cmddelay
 ##    lcd_enabled
 ##    lcd_type
 ##    lcdproc_host
@@ -350,11 +465,11 @@ def getconfig(configfile='pwdgen.cfg'):
 
     # default values
     defaults = {'dict':'/usr/share/dict/words',
-                'minlength':'4',
-                'maxlength':'7',
+                'min_length':'4',
+                'max_length':'7',
                 'words':'2',
                 'seperator':'.',
-                'generate':'3',
+                'generate':'10',
                 'leet':'no',
                 'prefix_digits':'0',
                 'suffix_digits':'0',
@@ -365,16 +480,19 @@ def getconfig(configfile='pwdgen.cfg'):
                 'host':'127.0.0.1',
                 'port':'13666',
                 
-                'ground_pin':'-1'}
+                'ground_pin':'-1',
+
+                'cmd_delay':'1',
+                'target':'',
+                'windows_cmd':'',
+                'pixel_cmd':'',
+                'shell_cmd':''}
     
     cp = ConfigParser.SafeConfigParser(defaults)
     config_list = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'pwdgen.cfg'),
                    configfile]
 
     read = cp.read(config_list)
-##    if len(read) == 0:
-##        configfile = os.path.join(os.path.dirname(os.path.realpath(__file__)),'pwdgen.cfg')
-##        read == cp.read(configfile)
     if len(read) == 0:
         logging.error('Unable to read config file.')
         sys.exit('Unable to read config file.')
@@ -384,8 +502,8 @@ def getconfig(configfile='pwdgen.cfg'):
     # password section
     # all needed so don't trap any exceptions
     config['pwd_dict'] = cp.get('password', 'dict')
-    config['pwd_minlength'] = cp.getint('password', 'minlength')
-    config['pwd_maxlength'] = cp.getint('password', 'maxlength')
+    config['pwd_minlength'] = cp.getint('password', 'min_length')
+    config['pwd_maxlength'] = cp.getint('password', 'max_length')
     config['pwd_words'] = cp.getint('password', 'words')
     config['pwd_seperator'] = cp.get('password', 'seperator')
     # seperator is not currently validated
@@ -462,11 +580,32 @@ def getconfig(configfile='pwdgen.cfg'):
     try:
         config['hidkey_enabled'] = cp.getboolean('hidkeyboard', 'enabled')
         config['hidkey_device'] = cp.get('hidkeyboard', 'device')
+        config['hidkey_launch'] = cp.getboolean('hidkeyboard', 'launch')
+        config['hidkey_target'] = cp.get('hidkeyboard', 'target').lower()
+        config['hidkey_cmddelay'] = cp.getfloat('hidkeyboard','cmd_delay')
+        win_cmd = cp.get('hidkeyboard', 'windows_cmd')
+        pixel_cmd = cp.get('hidkeyboard', 'pixel_cmd')
+        shell_cmd = cp.get('hidkeyboard', 'shell_cmd')
+        # basic validation for lauch options
+        if config['hidkey_launch']:
+            if config['hidkey_target'] == 'windows':
+                config['hidkey_cmd'] = win_cmd
+            elif config['hidkey_target'] == 'pixel':
+                config['hidkey_cmd'] = pixel_cmd
+            elif config['hidkey_target'] == 'shell':
+                config['hidkey_cmd'] = shell_cmd
+            else:
+                logging.warning('Invalid launch target (%s) specified. Application launch disabled.' % config['hidkey_target'])
+                config['hidkey_launch'] = False
+                config['hidkey_target'] = None
+                config['hidkey_cmd'] = ''
+        else:
+            config['hidkey_cmd'] = ''
     except KeyboardInterrupt:
         raise
     except:
         logging.exception("Unabled to read hidkeyboard config")
-        config['button_enabled'] = False
+        config['hidkey_enabled'] = False
 
     return config
 
@@ -642,6 +781,8 @@ def genpasswords(wordlist, rng, cfg):
 
 def outputpasswords(passwords, devices):
     """write passwords to configured devices"""
+    for d in devices:
+        d.launch()
     i = 1
     for p in passwords:
         for d in devices:
@@ -655,6 +796,8 @@ if __name__ == '__main__':
         rng = random.SystemRandom()
         g_run_threads = True
         cfg, args = getopts()
+        # set global debug flag
+        _DEBUG = args.debug
 
         lcds = []
         # console output
@@ -677,9 +820,13 @@ if __name__ == '__main__':
 
         if cfg['hidkey_enabled']:
             lcds.append(hidkey(enabled=True,
-                               device=cfg['hidkey_device']))
-
+                               device=cfg['hidkey_device'],
+                               launch=cfg['hidkey_launch'],
+                               target=cfg['hidkey_target'],
+                               cmd=cfg['hidkey_cmd']))
+        logging.debug('Loading wordlist...')
         wordlist = loadwordlist(cfg['pwd_dict'], cfg['pwd_minlength'], cfg['pwd_maxlength'])
+        logging.debug('...Done')
 
         if args.once:
             outputpasswords(genpasswords(wordlist=wordlist,

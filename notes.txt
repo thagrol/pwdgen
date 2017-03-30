@@ -1,3 +1,70 @@
 list of debian wordlist packages:
 	https://packages.debian.org/jessie/wordlist
 
+installation from clean jessie-lite
+	sudo raspi-config
+		change host name
+		expand filesystem
+		enable ssh
+		reduce gpumem
+		disable wait for network
+
+	sudo apt update
+	sudo apt upgrade
+
+sudo apt install python-pip python-gpiozero wbritish
+
+[optional] move /tmp to tmpfs
+	sudo nano /etc/fstab
+		add "tmpfs           /tmp            tmpfs   defaults        0       0"
+
+config.txt
+	add "dtparm=random=on"
+	if using USB HID keyboard output:
+		add "dtoverlay=dwc2"
+
+install pwdgen
+	get files
+	edit config:
+		[password]
+			edit as required
+		[lcd] section
+			edit as required
+		[hd44780]
+			edit as required
+		[button]
+			edit as required
+		[hidkeyboard]
+			edit as required
+
+	if using USB HID keyboard output:
+		sudo cp 10-hidg.rules /etc/udev/rules.d/
+
+	sudo nano /etc/rc.local
+		if using USB HID keyboard output:
+			add "/path/to/hidsetup.sh &"
+		if push button trigger required:
+			add "/path/to/pwdgen.py &"
+
+button
+	connect a SPST push to make switch between the configured gpio pin and ground
+
+for overlayfs root (makes real root read only)
+	install boot script:
+		sudo cp overlayRoot.sh /usr/local/sbin
+	disable swap:
+		sudo dphys-swapfile swapoff
+		sudo dphys-swapfile uninstall
+		sudo update-rc.d dphys-swapfile remove
+	config cmdline.txt
+		sudo cp /boot/cmdline.txt /boot/cdmline.default
+		sudo cp /boot/cmdline.txt /boot/cdmline.overlay
+		edit /boot/cmdline.overlay
+			add " init=/usr/local/sbin/overlayRoot.sh"
+	to enable overlayfs root
+		sudo cp /boot/cmdline.overlay /boot/cmdline.txt
+		sudo reboot
+	to disable overlayfs root
+		sudo cp /boot/cmdline.default /boot/cmdline.txt
+		sudo reboot
+
